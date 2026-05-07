@@ -1,4 +1,53 @@
+const fetchGithubRepo = async (url) => {
+  try {
+    const match = url.trim().match(/https:\/\/github\.com\/([^\/]+)\/([^\/]+)/);
+    if (!match) return url; // Không phải link chuẩn thì trả về nguyên gốc
+    
+    const owner = match[1];
+    let repo = match[2].replace('.git', '');
+    
+    const repoInfoRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+    if (!repoInfoRes.ok) return `// Lỗi: Không thể truy cập Repo (Có thể Private hoặc quá giới hạn API của Github)`;
+    const repoInfo = await repoInfoRes.json();
+    const branch = repoInfo.default_branch;
+
+    const treeRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`);
+    const treeData = await treeRes.json();
+    if (!treeData.tree) return `// Lỗi: Không đọc được cấu trúc thư mục.`;
+
+    const validExts = ['.js', '.jsx', '.ts', '.tsx', '.move', '.rs', '.py', '.cpp', '.go', '.java', '.sol'];
+    const files = treeData.tree.filter(item => 
+      item.type === 'blob' && 
+      validExts.some(ext => item.path.endsWith(ext)) &&
+      !item.path.includes('node_modules') &&
+      !item.path.includes('dist') &&
+      !item.path.includes('.min.js')
+    );
+
+    if (files.length === 0) return `// Lỗi: Không tìm thấy file mã nguồn nào.`;
+
+    // Chọn ngẫu nhiên tối đa 2 file để phân tích, tránh quá tải text
+    const selectedFiles = files.sort(() => Math.random() - 0.5).slice(0, 2);
+    
+    let combinedCode = ``;
+    for (const file of selectedFiles) {
+      const fileRes = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`);
+      const content = await fileRes.text();
+      combinedCode += `// ==========================================\n// File: ${file.path}\n// ==========================================\n${content}\n\n`;
+    }
+    return combinedCode;
+  } catch(e) {
+    return `// Lỗi tải Github Repo: ${e.message}`;
+  }
+};
+
 export const analyzeCode = async (code, apiKey = import.meta.env.VITE_GEMINI_API_KEY) => {
+  // Nếu người dùng dán link Github, tự động tải code về
+  let finalCode = code;
+  if (code.trim().startsWith('https://github.com/') && code.trim().split('\n').length === 1) {
+    finalCode = await fetchGithubRepo(code);
+  }
+
   // Nếu có API Key, sử dụng AI thật (Google Gemini)
   if (apiKey && apiKey.trim() !== '') {
     try {
@@ -16,7 +65,7 @@ Mỗi phần tử trong mảng đại diện cho một khối code, có cấu tr
 }
 
 Đoạn code cần phân tích:
-${code}
+${finalCode}
 `;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
@@ -102,10 +151,10 @@ ${code}
   // ==========================================
   return new Promise((resolve) => {
     setTimeout(() => {
-      let rawBlocks = code.split('\n\n').filter(b => b.trim().length > 0);
+      let rawBlocks = finalCode.split('\n\n').filter(b => b.trim().length > 0);
       
       if (rawBlocks.length === 1) {
-        rawBlocks = code.split('}\n').map(b => b.trim() ? b + '}' : '').filter(b => b.length > 1);
+        rawBlocks = finalCode.split('}\n').map(b => b.trim() ? b + '}' : '').filter(b => b.length > 1);
       }
       rawBlocks = rawBlocks.map(b => b.trim()).filter(b => b.length > 0);
 
@@ -194,7 +243,7 @@ ${code}
           title: 'Luyện Gõ: Toàn bộ Code',
           instruction: 'Gõ lại chính xác mã nguồn vào ô bên dưới.',
           description: 'Mã nguồn nguyên bản.',
-          code: code.trim(),
+          code: finalCode.trim(),
         });
       }
 

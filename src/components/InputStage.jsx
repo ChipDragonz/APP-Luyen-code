@@ -22,7 +22,7 @@ export default function InputStage({ onSubmit }) {
 
       <textarea
         className="input-area"
-        placeholder="Dán code của bạn vào đây... (ví dụ: Move, JavaScript, Python, C++)"
+        placeholder="Dán code của bạn HOẶC dán Link Github Repo vào đây... (ví dụ: https://github.com/user/repo)"
         value={code}
         onChange={(e) => setCode(e.target.value)}
         spellCheck="false"
