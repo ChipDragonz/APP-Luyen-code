@@ -1,73 +1,125 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function TypingMode({ exercise, onComplete }) {
-  const [inputs, setInputs] = useState({});
-  const [isAllCorrect, setIsAllCorrect] = useState(false);
+  const [userInput, setUserInput] = useState('');
+  const [isCorrect, setIsCorrect] = useState(false);
+  const textareaRef = useRef(null);
+
+  // Focus textarea when component mounts
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [exercise]);
+
+  // Reset input when exercise changes
+  useEffect(() => {
+    setUserInput('');
+    setIsCorrect(false);
+  }, [exercise]);
 
   useEffect(() => {
-    // Check if all inputs match their answers exactly
-    let correct = true;
-    for (let i = 0; i < exercise.snippet.length; i++) {
-      const part = exercise.snippet[i];
-      if (part.type === 'input') {
-        if (inputs[i] !== part.answer) {
-          correct = false;
-          break;
-        }
-      }
+    if (userInput === exercise.code) {
+      setIsCorrect(true);
+    } else {
+      setIsCorrect(false);
     }
-    setIsAllCorrect(correct);
-  }, [inputs, exercise]);
+  }, [userInput, exercise.code]);
 
-  const handleInputChange = (index, value) => {
-    setInputs({ ...inputs, [index]: value });
+  const handleChange = (e) => {
+    setUserInput(e.target.value);
   };
 
-  const getStatusClass = (index, answer) => {
-    if (!inputs[index]) return '';
-    return inputs[index] === answer ? 'correct' : 'incorrect';
+  // Hàm hỗ trợ ngăn chặn phím Tab làm mất focus và thay thế bằng khoảng trắng
+  const handleKeyDown = (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+      // Chèn 4 khoảng trắng
+      const newValue = userInput.substring(0, start) + '    ' + userInput.substring(end);
+      setUserInput(newValue);
+      // Đặt lại con trỏ
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + 4;
+        }
+      }, 0);
+    }
   };
 
   return (
     <div className="fade-in">
-      <div className="mode-badge">Chế độ 1: Gợi Nhớ & Nhập Liệu</div>
+      <div className="mode-badge">Luyện gõ Code</div>
       <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{exercise.title}</h3>
       <p style={{ color: 'var(--border-color)', marginBottom: '1.5rem' }}>{exercise.instruction}</p>
 
-      <div className="code-display">
-        {exercise.snippet.map((part, index) => {
-          if (part.type === 'text') {
-            return <span key={index}>{part.content}</span>;
-          }
-          if (part.type === 'input') {
+      {/* Hiển thị code gốc với màu sắc thể hiện đúng/sai */}
+      <div className="code-display" style={{ marginBottom: '1rem', position: 'relative' }}>
+        <pre style={{ margin: 0, fontFamily: 'var(--font-mono)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+          {exercise.code.split('').map((char, index) => {
+            let color = 'var(--text-color)';
+            let backgroundColor = 'transparent';
+            let opacity = 0.5; // Chưa gõ
+
+            if (index < userInput.length) {
+              opacity = 1;
+              if (userInput[index] === char) {
+                color = 'var(--success-color)'; // Đúng
+              } else {
+                color = 'white';
+                backgroundColor = 'var(--error-color)'; // Sai
+              }
+            }
+
+            // Highlight con trỏ hiện tại
+            if (index === userInput.length && !isCorrect) {
+              backgroundColor = 'rgba(59, 130, 246, 0.3)';
+            }
+
             return (
-              <input
-                key={index}
-                type="text"
-                className={`code-input ${getStatusClass(index, part.answer)}`}
-                placeholder={part.placeholder}
-                value={inputs[index] || ''}
-                onChange={(e) => handleInputChange(index, e.target.value)}
-                style={{ width: `${Math.max(part.answer.length * 10, 60)}px` }}
-              />
+              <span key={index} style={{ color, backgroundColor, opacity, transition: 'all 0.1s' }}>
+                {char === '\n' ? (
+                  // Ký tự xuống dòng cũng cần hiển thị màu nền nếu gõ sai hoặc đang ở vị trí con trỏ
+                  <span style={{ display: 'inline-block', width: '10px', height: '1em', verticalAlign: 'bottom' }}>
+                    {'\n'}
+                  </span>
+                ) : char}
+              </span>
             );
-          }
-          return null;
-        })}
+          })}
+        </pre>
       </div>
 
+      {/* Vùng nhập liệu */}
+      <textarea
+        ref={textareaRef}
+        className="input-area"
+        style={{ minHeight: '150px', marginBottom: '0', borderColor: isCorrect ? 'var(--success-color)' : 'var(--border-color)' }}
+        value={userInput}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        placeholder="Bắt đầu gõ code tại đây..."
+        spellCheck="false"
+        disabled={isCorrect}
+      />
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isAllCorrect ? 'var(--success-color)' : 'var(--text-color)' }}>
-          {isAllCorrect && <CheckCircle2 size={20} />}
-          <span>{isAllCorrect ? 'Chính xác! Bạn có thể tiếp tục.' : 'Điền đúng tất cả các chỗ trống để tiếp tục.'}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isCorrect ? 'var(--success-color)' : 'var(--text-color)' }}>
+          {isCorrect && <CheckCircle2 size={20} />}
+          <span>
+            {isCorrect 
+              ? 'Hoàn hảo! Bạn gõ chính xác 100%.' 
+              : `Đã gõ: ${userInput.length} / ${exercise.code.length} ký tự`}
+          </span>
         </div>
         <button 
           className="btn btn-primary" 
           onClick={onComplete}
-          disabled={!isAllCorrect}
+          disabled={!isCorrect}
         >
-          Thử Thách Tiếp Theo
+          Hàm Tiếp Theo
           <ArrowRight size={18} />
         </button>
       </div>
