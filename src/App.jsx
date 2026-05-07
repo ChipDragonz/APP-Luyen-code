@@ -6,6 +6,7 @@ import TypingMode from './components/TypingMode';
 import SortMode from './components/SortMode';
 import QuizMode from './components/QuizMode';
 import Companion from './components/Companion';
+import BalloonGame from './components/BalloonGame';
 import { analyzeCode } from './mock/analyzer';
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
   return (
     <div className="app-container" style={{ maxWidth: stage === 'gameplay' ? '1200px' : '1000px', display: 'flex', flexDirection: 'row', gap: '2rem' }}>
       <Companion />
+      <BalloonGame />
       
       {/* Menu Sidebar (Chỉ hiện trong Gameplay) */}
       {stage === 'gameplay' && (
