@@ -103,3 +103,48 @@ export const playSuccessSound = () => {
     osc.stop(startTime + i * 0.1 + 0.3);
   });
 };
+
+// Hiệu ứng hạt sao băng rơi
+export const spawnStar = () => {
+  const star = document.createElement('div');
+  
+  // Style trực tiếp để không cần sửa CSS
+  star.style.position = 'fixed';
+  star.style.width = '2px';
+  star.style.height = `${40 + Math.random() * 40}px`;
+  star.style.background = 'linear-gradient(to bottom, transparent, var(--primary-color))';
+  star.style.filter = 'drop-shadow(0 0 5px var(--primary-color))';
+  star.style.borderRadius = '2px';
+  star.style.pointerEvents = 'none';
+  star.style.zIndex = '0'; // Chìm dưới các card kính
+  
+  // Vị trí xuất phát ngẫu nhiên trên cùng màn hình
+  const startX = Math.random() * window.innerWidth;
+  const startY = -100; // Bắt đầu cao hơn màn hình một chút
+  
+  star.style.left = `${startX}px`;
+  star.style.top = `${startY}px`;
+  
+  // Góc rơi chéo nhẹ từ phải sang trái
+  const angle = 25 + Math.random() * 10;
+  star.style.transform = `rotate(${angle}deg)`;
+  
+  document.body.appendChild(star);
+  
+  const duration = 400 + Math.random() * 400; // Rơi rất nhanh (400-800ms)
+  const distanceX = -window.innerHeight * Math.tan(angle * Math.PI / 180);
+  
+  star.animate([
+    { transform: `translate(0, 0) rotate(${angle}deg)`, opacity: 1 },
+    { transform: `translate(${distanceX}px, ${window.innerHeight + 200}px) rotate(${angle}deg)`, opacity: 0.2 }
+  ], {
+    duration: duration,
+    easing: 'linear',
+    fill: 'forwards'
+  });
+  
+  // Dọn dẹp DOM sau khi rơi xong
+  setTimeout(() => {
+    star.remove();
+  }, duration);
+};

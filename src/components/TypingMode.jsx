@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { playClickSound, playErrorSound, playSuccessSound } from '../utils/soundFX';
+import { playClickSound, playErrorSound, playSuccessSound, spawnStar } from '../utils/soundFX';
 
 export default function TypingMode({ exercise, onComplete }) {
   const [userInput, setUserInput] = useState('');
@@ -67,6 +67,7 @@ export default function TypingMode({ exercise, onComplete }) {
       const lastCharIdx = newVal.length - 1;
       if (newVal[lastCharIdx] === exercise.code[lastCharIdx]) {
         playClickSound();
+        spawnStar(); // Triệu hồi sao băng khi gõ đúng!
       } else {
         playErrorSound();
         setMistakes(m => m + 1);
