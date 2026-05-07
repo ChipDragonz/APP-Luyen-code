@@ -207,10 +207,14 @@ ${finalCode}
         } else if (block.includes('const ')) {
           funcName = 'Khai báo hằng số';
         }
-        }
 
         const blockCode = block.replace(/\/\/.*/g, '').trim();
         if (blockCode.length === 0) return; // Bỏ qua nếu block chỉ toàn comment
+
+        // Tìm filepath trong comment block nếu có
+        let currentFilePath = '';
+        const fileMatch = block.match(/\/\/\s*File:\s*(.+)/);
+        if (fileMatch) currentFilePath = fileMatch[1].trim();
 
         const isBlankMode = Math.random() < 0.3;
         levels.push({
@@ -237,7 +241,7 @@ ${finalCode}
               'Không có tác dụng gì, chỉ để test.'
             ].sort(() => Math.random() - 0.5),
             answer: description.substring(0, 100) + (description.length > 100 ? '...' : ''),
-            code: cleanCode
+            code: blockCode
           });
         }
       });
