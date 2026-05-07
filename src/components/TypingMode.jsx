@@ -9,6 +9,7 @@ export default function TypingMode({ exercise, onComplete }) {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [mistakes, setMistakes] = useState(0);
+  const textareaRef = useRef(null);
 
   // Focus textarea when component mounts
   useEffect(() => {
