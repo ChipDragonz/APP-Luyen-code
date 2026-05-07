@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { playClickSound, playErrorSound, playSuccessSound, spawnStar, playPopSound } from '../utils/soundFX';
@@ -217,60 +218,63 @@ export default function TypingMode({ exercise, onComplete }) {
   return (
     <div className="fade-in" style={{ position: 'relative' }}>
       
-      {/* Balloon Game UI */}
-      <div style={{
-        position: 'fixed',
-        right: '2rem',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        zIndex: 50, // Đưa lên trên cùng để không bị che khuất
-        pointerEvents: 'none' // Click through the balloon
-      }}>
-        <div 
-          ref={balloonRef}
-          style={{
-            width: `${60 + (balloonLetters.length * 3)}px`,
-            height: `${80 + (balloonLetters.length * 3.5)}px`,
-            backgroundColor: popEffect ? 'transparent' : 'var(--primary-color)',
-            borderRadius: '50% 50% 50% 50% / 40% 40% 60% 60%',
-            boxShadow: popEffect ? 'none' : 'inset -10px -10px 20px rgba(0,0,0,0.5), 0 0 15px var(--primary-color)',
-            transition: 'all 0.1s ease-out',
-            position: 'relative',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-            paddingBottom: '0.5rem',
-            overflow: 'hidden',
-            opacity: popEffect ? 0 : 0.9,
-            transform: `scale(${popEffect ? 1.5 : 1}) translateY(${popEffect ? '-20px' : '0'})`
-          }}
-        >
-          {balloonLetters.map((char, i) => (
-            <span key={i} style={{ 
-              position: 'absolute', 
-              bottom: `${10 + Math.random() * 40}px`, 
-              left: `${10 + Math.random() * (40 + balloonLetters.length * 2)}px`, 
-              color: '#0a0a0a', 
-              fontWeight: 'bold',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '1.2rem',
-              transform: `rotate(${Math.random() * 360}deg)`,
-              transition: 'all 0.2s'
-            }}>{char}</span>
-          ))}
-        </div>
-        {/* Dây bóng */}
+      {/* Balloon Game UI (Rendered outside the React root via Portal) */}
+      {createPortal(
         <div style={{
-          width: '2px',
-          height: '50px',
-          backgroundColor: 'rgba(255,255,255,0.5)',
-          opacity: popEffect ? 0 : 1,
-          transition: 'all 0.2s'
-        }}></div>
-      </div>
+          position: 'fixed',
+          right: '2rem',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          zIndex: 9999, // Đảm bảo nổi lên trên MỌI THỨ
+          pointerEvents: 'none' // Click through the balloon
+        }}>
+          <div 
+            ref={balloonRef}
+            style={{
+              width: `${60 + (balloonLetters.length * 3)}px`,
+              height: `${80 + (balloonLetters.length * 3.5)}px`,
+              backgroundColor: popEffect ? 'transparent' : 'var(--primary-color)',
+              borderRadius: '50% 50% 50% 50% / 40% 40% 60% 60%',
+              boxShadow: popEffect ? 'none' : 'inset -10px -10px 20px rgba(0,0,0,0.5), 0 0 15px var(--primary-color)',
+              transition: 'all 0.1s ease-out',
+              position: 'relative',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              paddingBottom: '0.5rem',
+              overflow: 'hidden',
+              opacity: popEffect ? 0 : 0.9,
+              transform: `scale(${popEffect ? 1.5 : 1}) translateY(${popEffect ? '-20px' : '0'})`
+            }}
+          >
+            {balloonLetters.map((char, i) => (
+              <span key={i} style={{ 
+                position: 'absolute', 
+                bottom: `${10 + Math.random() * 40}px`, 
+                left: `${10 + Math.random() * (40 + balloonLetters.length * 2)}px`, 
+                color: '#0a0a0a', 
+                fontWeight: 'bold',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '1.2rem',
+                transform: `rotate(${Math.random() * 360}deg)`,
+                transition: 'all 0.2s'
+              }}>{char}</span>
+            ))}
+          </div>
+          {/* Dây bóng */}
+          <div style={{
+            width: '2px',
+            height: '50px',
+            backgroundColor: 'rgba(255,255,255,0.5)',
+            opacity: popEffect ? 0 : 1,
+            transition: 'all 0.2s'
+          }}></div>
+        </div>,
+        document.body
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
