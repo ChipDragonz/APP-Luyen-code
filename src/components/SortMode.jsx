@@ -76,7 +76,14 @@ export default function SortMode({ exercise, onComplete }) {
 
   return (
     <div className="fade-in">
-      <div className="mode-badge">Chế độ 2: Sắp xếp Logic</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+        <div className="mode-badge" style={{ margin: 0 }}>Chế độ 2: Sắp xếp Logic</div>
+        {exercise.filePath && (
+          <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>
+            📄 {exercise.filePath}
+          </div>
+        )}
+      </div>
       <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{exercise.title}</h3>
       <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{exercise.instruction}</p>
 

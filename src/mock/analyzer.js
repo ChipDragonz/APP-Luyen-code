@@ -56,6 +56,7 @@ Bạn là một chuyên gia lập trình. Hãy phân tích đoạn code sau và 
 Trả về KẾT QUẢ DUY NHẤT LÀ MỘT MẢNG JSON HỢP LỆ (không có markdown \`\`\`json).
 Mỗi phần tử trong mảng đại diện cho một khối code, có cấu trúc sau:
 {
+  "file_path": "đường dẫn file chứa khối code này (nếu có ghi trong comment phía trên, ví dụ: src/main.js)",
   "code": "đoạn code gốc của hàm/struct (chỉ lấy code lõi, XÓA HẾT COMMENT để người dùng luyện gõ sạch sẽ)",
   "name": "tên hàm hoặc struct",
   "description": "Giải thích ngắn gọn (1-2 câu tiếng Việt) chức năng của đoạn code này",
@@ -103,6 +104,7 @@ ${finalCode}
           title: `Luyện Gõ: ${block.name}`,
           instruction: 'Gõ lại chính xác đoạn mã nguồn này.',
           description: block.description,
+          filePath: block.file_path || '',
           code: block.code.trim(),
         });
 
@@ -116,6 +118,7 @@ ${finalCode}
             question: block.quiz_question,
             options: block.quiz_options.sort(() => Math.random() - 0.5),
             answer: block.quiz_answer,
+            filePath: block.file_path || '',
             code: block.code.trim()
           });
         }
