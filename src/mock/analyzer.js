@@ -1,4 +1,4 @@
-export const analyzeCode = async (code, apiKey = '') => {
+export const analyzeCode = async (code, apiKey = import.meta.env.VITE_GEMINI_API_KEY) => {
   // Nếu có API Key, sử dụng AI thật (Google Gemini)
   if (apiKey && apiKey.trim() !== '') {
     try {

@@ -23,9 +23,9 @@ function App() {
     }
   }, [darkMode]);
 
-  const handleCodeSubmit = async (code, apiKey) => {
+  const handleCodeSubmit = async (code) => {
     setStage('analysis');
-    const generatedLevels = await analyzeCode(code, apiKey);
+    const generatedLevels = await analyzeCode(code);
     setLevels(generatedLevels);
     setCurrentLevelIndex(0);
     setCompletedLevels({});
