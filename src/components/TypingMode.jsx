@@ -219,13 +219,14 @@ export default function TypingMode({ exercise, onComplete }) {
       
       {/* Balloon Game UI */}
       <div style={{
-        position: 'absolute',
-        right: '1rem',
-        top: '10%',
+        position: 'fixed',
+        right: '4rem',
+        top: '50%',
+        transform: 'translateY(-50%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        zIndex: 5,
+        zIndex: 0,
         pointerEvents: 'none' // Click through the balloon
       }}>
         <div 
