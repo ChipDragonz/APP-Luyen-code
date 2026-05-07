@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { playClickSound, playErrorSound, playSuccessSound } from '../utils/soundFX';
 
 export default function TypingMode({ exercise, onComplete }) {
   const [userInput, setUserInput] = useState('');
@@ -20,15 +22,36 @@ export default function TypingMode({ exercise, onComplete }) {
   }, [exercise]);
 
   useEffect(() => {
-    if (userInput === exercise.code) {
+    if (userInput === exercise.code && exercise.code.length > 0) {
       setIsCorrect(true);
+      playSuccessSound();
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#00ff41', '#00cc33', '#ffffff']
+      });
     } else {
       setIsCorrect(false);
     }
   }, [userInput, exercise.code]);
 
   const handleChange = (e) => {
-    setUserInput(e.target.value);
+    const newVal = e.target.value;
+    
+    // Play sound based on input correctness
+    if (newVal.length > userInput.length) {
+      const lastCharIdx = newVal.length - 1;
+      if (newVal[lastCharIdx] === exercise.code[lastCharIdx]) {
+        playClickSound();
+      } else {
+        playErrorSound();
+      }
+    } else if (newVal.length < userInput.length) {
+      playClickSound(); // Backspace sound
+    }
+
+    setUserInput(newVal);
   };
 
   const handleKeyDown = (e) => {
