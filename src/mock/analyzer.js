@@ -1,10 +1,27 @@
 const fetchGithubRepo = async (url) => {
   try {
-    const match = url.trim().match(/https:\/\/github\.com\/([^\/]+)\/([^\/]+)/);
-    if (!match) return url; // Không phải link chuẩn thì trả về nguyên gốc
+    const cleanUrl = url.trim();
     
-    const owner = match[1];
-    let repo = match[2].replace('.git', '');
+    // 1. Kiểm tra xem có phải là link trỏ đến 1 file cụ thể không (vd: .../blob/main/src/file.js)
+    const fileMatch = cleanUrl.match(/https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)/);
+    if (fileMatch) {
+      const owner = fileMatch[1];
+      const repo = fileMatch[2];
+      const branch = fileMatch[3];
+      const filePath = fileMatch[4];
+      
+      const fileRes = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath}`);
+      if (!fileRes.ok) return `// Lỗi: Không thể tải file. Có thể repo Private hoặc sai link.`;
+      const content = await fileRes.text();
+      return `// ==========================================\n// File: ${filePath}\n// ==========================================\n${content}\n\n`;
+    }
+
+    // 2. Nếu là link Repo chung chung, tải ngẫu nhiên 2 file
+    const repoMatch = cleanUrl.match(/https:\/\/github\.com\/([^\/]+)\/([^\/]+)/);
+    if (!repoMatch) return url; // Không phải link chuẩn thì trả về nguyên gốc
+    
+    const owner = repoMatch[1];
+    let repo = repoMatch[2].replace('.git', '');
     
     const repoInfoRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
     if (!repoInfoRes.ok) return `// Lỗi: Không thể truy cập Repo (Có thể Private hoặc quá giới hạn API của Github)`;
@@ -26,7 +43,7 @@ const fetchGithubRepo = async (url) => {
 
     if (files.length === 0) return `// Lỗi: Không tìm thấy file mã nguồn nào.`;
 
-    // Chọn ngẫu nhiên tối đa 2 file để phân tích, tránh quá tải text
+    // Chọn ngẫu nhiên tối đa 2 file
     const selectedFiles = files.sort(() => Math.random() - 0.5).slice(0, 2);
     
     let combinedCode = ``;
