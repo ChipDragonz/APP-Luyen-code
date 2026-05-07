@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Moon, Sun, Trophy, RefreshCw, Terminal, CheckCircle2, Menu, X, Edit3 } from 'lucide-react';
+import { Moon, Sun, Trophy, RefreshCw, Terminal, CheckCircle2, Menu, X } from 'lucide-react';
 import InputStage from './components/InputStage';
 import AnalysisStage from './components/AnalysisStage';
 import TypingMode from './components/TypingMode';
 import SortMode from './components/SortMode';
 import QuizMode from './components/QuizMode';
-import BlankMode from './components/BlankMode';
 import Companion from './components/Companion';
 import { analyzeCode } from './mock/analyzer';
 
@@ -61,7 +60,6 @@ function App() {
   const getModeIcon = (type) => {
     if (type === 'typing') return <Terminal size={16} />;
     if (type === 'quiz') return <CheckCircle2 size={16} />;
-    if (type === 'fill_blank') return <Edit3 size={16} />;
     return <RefreshCw size={16} />;
   };
 
@@ -151,13 +149,6 @@ function App() {
 
               {levels[currentLevelIndex].type === 'quiz' && (
                 <QuizMode 
-                  exercise={levels[currentLevelIndex]} 
-                  onComplete={handleLevelComplete} 
-                />
-              )}
-              
-              {levels[currentLevelIndex].type === 'fill_blank' && (
-                <BlankMode 
                   exercise={levels[currentLevelIndex]} 
                   onComplete={handleLevelComplete} 
                 />
