@@ -21,7 +21,7 @@ export default function QuizMode({ exercise, onComplete }) {
         Hỏi & Đáp (Quiz)
       </div>
       <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{exercise.title}</h3>
-      <p style={{ color: 'var(--border-color)', marginBottom: '1.5rem' }}>{exercise.instruction}</p>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{exercise.instruction}</p>
 
       {/* Hiển thị code gốc mờ mờ làm ngữ cảnh */}
       <div className="code-display" style={{ marginBottom: '1.5rem', opacity: 0.7, maxHeight: '150px', overflowY: 'auto' }}>

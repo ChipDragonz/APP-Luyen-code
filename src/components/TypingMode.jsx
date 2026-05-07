@@ -53,7 +53,7 @@ export default function TypingMode({ exercise, onComplete }) {
     <div className="fade-in">
       <div className="mode-badge">Luyện gõ Code</div>
       <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{exercise.title}</h3>
-      <p style={{ color: 'var(--border-color)', marginBottom: '1rem' }}>{exercise.instruction}</p>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>{exercise.instruction}</p>
 
       {/* Thông tin giải thích hàm */}
       <div style={{ backgroundColor: 'rgba(0, 255, 65, 0.05)', borderLeft: '4px solid var(--primary-color)', padding: '1rem', marginBottom: '1.5rem', fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--text-color)' }}>

@@ -78,7 +78,7 @@ export default function SortMode({ exercise, onComplete }) {
     <div className="fade-in">
       <div className="mode-badge">Chế độ 2: Sắp xếp Logic</div>
       <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{exercise.title}</h3>
-      <p style={{ color: 'var(--border-color)', marginBottom: '1.5rem' }}>{exercise.instruction}</p>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{exercise.instruction}</p>
 
       <div style={{ backgroundColor: 'var(--code-bg)', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid var(--border-color)', marginBottom: '1.5rem' }}>
         <DndContext 

@@ -16,7 +16,7 @@ export default function AnalysisStage() {
       <div className="loader"></div>
       <Cpu size={48} color="var(--primary-color)" style={{ marginBottom: '1rem' }} />
       <h2 style={{ marginBottom: '0.5rem' }}>Trí tuệ nhân tạo đang phân tích</h2>
-      <p style={{ color: 'var(--border-color)' }}>Đang tạo các bài tập cá nhân hóa dựa trên code của bạn{dots}</p>
+      <p style={{ color: 'var(--text-muted)' }}>Đang tạo các bài tập cá nhân hóa dựa trên code của bạn{dots}</p>
     </div>
   );
 }

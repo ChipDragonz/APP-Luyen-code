@@ -32,6 +32,9 @@ export const analyzeCode = async (code) => {
           funcName = 'Khai báo hằng số';
         }
 
+        // Xóa dòng comment khỏi mã nguồn luyện gõ để đỡ rối
+        const cleanCode = block.replace(/\/\/.*/g, '').trim();
+
         // Tạo bài tập Gõ Code (Typing)
         levels.push({
           id: levelId++,
@@ -39,7 +42,7 @@ export const analyzeCode = async (code) => {
           title: `Luyện Gõ: ${funcName}`,
           instruction: 'Gõ lại chính xác đoạn mã nguồn này.',
           description: description,
-          code: block,
+          code: cleanCode,
         });
 
         // Tạo ngẫu nhiên một câu hỏi trắc nghiệm (Quiz) cho một số khối (để kết hợp học và chơi)
@@ -57,7 +60,7 @@ export const analyzeCode = async (code) => {
               'Không có tác dụng gì, chỉ để test.'
             ].sort(() => Math.random() - 0.5),
             answer: description.substring(0, 100) + (description.length > 100 ? '...' : ''),
-            code: block // Vẫn hiển thị code để tham khảo
+            code: cleanCode // Ẩn comment đi để không lộ đáp án
           });
         }
       });
@@ -66,7 +69,7 @@ export const analyzeCode = async (code) => {
       if (rawBlocks.length > 1) {
         const shuffledBlocks = rawBlocks.map((content, i) => ({
           id: `b${i}`,
-          content: content
+          content: content.replace(/\/\/.*/g, '').trim()
         })).sort(() => Math.random() - 0.5);
 
         levels.push({

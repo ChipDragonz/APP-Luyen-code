@@ -15,7 +15,7 @@ export default function InputStage({ onSubmit }) {
       <div className="header">
         <div>
           <h2 className="title">Mini-Game Luyện Code</h2>
-          <p style={{ color: 'var(--border-color)', marginTop: '0.5rem' }}>Dán đoạn code của bạn vào đây để tạo các bài tập tương tác.</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>Dán đoạn code của bạn vào đây để tạo các bài tập tương tác.</p>
         </div>
         <Code2 size={32} color="var(--primary-color)" />
       </div>

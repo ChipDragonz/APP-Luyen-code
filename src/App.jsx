@@ -134,7 +134,7 @@ function App() {
           
           {stage === 'gameplay' && levels.length > 0 && (
             <div className="glass-card fade-in" style={{ flexGrow: 1 }}>
-              <div style={{ marginBottom: '1rem', color: 'var(--primary-color)', fontSize: '0.875rem', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.875rem', fontFamily: 'var(--font-mono)' }}>
                 {`> ĐANG THỰC THI CHƯƠNG TRÌNH: [${currentLevelIndex + 1}/${levels.length}]`}
               </div>
 
