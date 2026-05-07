@@ -32,7 +32,7 @@ const fetchGithubRepo = async (url) => {
     const treeData = await treeRes.json();
     if (!treeData.tree) return `// Lỗi: Không đọc được cấu trúc thư mục.`;
 
-    const validExts = ['.js', '.jsx', '.ts', '.tsx', '.move', '.rs', '.py', '.cpp', '.go', '.java', '.sol'];
+    const validExts = ['.js', '.jsx', '.ts', '.tsx', '.move', '.rs', '.py', '.cpp', '.go', '.java', '.sol', '.svelte', '.vue', '.html', '.css'];
     const files = treeData.tree.filter(item => 
       item.type === 'blob' && 
       validExts.some(ext => item.path.endsWith(ext)) &&

@@ -24,7 +24,7 @@ export default function InputStage({ onSubmit }) {
       const treeRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`);
       const treeData = await treeRes.json();
       
-      const validExts = ['.js', '.jsx', '.ts', '.tsx', '.move', '.rs', '.py', '.cpp', '.go', '.java', '.sol'];
+      const validExts = ['.js', '.jsx', '.ts', '.tsx', '.move', '.rs', '.py', '.cpp', '.go', '.java', '.sol', '.svelte', '.vue', '.html', '.css'];
       const files = treeData.tree.filter(item => 
         item.type === 'blob' && 
         validExts.some(ext => item.path.endsWith(ext)) &&
