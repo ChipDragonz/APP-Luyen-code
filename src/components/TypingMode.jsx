@@ -80,12 +80,7 @@ export default function TypingMode({ exercise, onComplete }) {
 
             return (
               <span key={index} style={{ color, backgroundColor, opacity, transition: 'all 0.1s' }}>
-                {char === '\n' ? (
-                  // Ký tự xuống dòng cũng cần hiển thị màu nền nếu gõ sai hoặc đang ở vị trí con trỏ
-                  <span style={{ display: 'inline-block', width: '10px', height: '1em', verticalAlign: 'bottom' }}>
-                    {'\n'}
-                  </span>
-                ) : char}
+                {char === '\n' ? '↵\n' : char}
               </span>
             );
           })}
