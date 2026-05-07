@@ -88,8 +88,8 @@ export default function TypingMode({ exercise, onComplete }) {
             const next = [...prev, {
               id: Date.now() + Math.random(),
               char: typedChar,
-              bottom: 10 + Math.random() * 50,
-              left: 15 + Math.random() * (30 + prev.length * 1.5),
+              bottom: (15 + Math.random() * 60) + '%', // Phân tán ngẫu nhiên 15% đến 75% chiều cao
+              left: (15 + Math.random() * 60) + '%', // Phân tán ngẫu nhiên 15% đến 75% chiều rộng
               rotate: Math.random() * 360
             }];
             
@@ -261,8 +261,8 @@ export default function TypingMode({ exercise, onComplete }) {
             {balloonLetters.map((item) => (
               <span key={item.id} style={{ 
                 position: 'absolute', 
-                bottom: `${item.bottom}px`, 
-                left: `${item.left}px`, 
+                bottom: item.bottom, 
+                left: item.left, 
                 color: '#0a0a0a', 
                 fontWeight: 'bold',
                 fontFamily: 'var(--font-mono)',
