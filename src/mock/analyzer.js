@@ -2,25 +2,65 @@
 export const analyzeCode = async (code) => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      // Tách code thành các khối (hàm, struct...) dựa trên dòng trắng (double newline)
+      // 1. Tách code thành các khối (hàm, struct...) dựa trên dòng trắng
       let rawBlocks = code.split('\n\n').filter(b => b.trim().length > 0);
       
-      // Nếu không có dòng trắng, chia theo dấu ngoặc nhọn kết thúc '}'
       if (rawBlocks.length === 1) {
         rawBlocks = code.split('}\n').map(b => b.trim() ? b + '}' : '').filter(b => b.length > 1);
       }
-
-      // Xóa khoảng trắng thừa ở đầu/cuối của mỗi block
       rawBlocks = rawBlocks.map(b => b.trim()).filter(b => b.length > 0);
 
-      // Tạo levels cho từng block (Typing Mode)
-      const levels = rawBlocks.map((block, index) => ({
-        id: index + 1,
-        type: 'typing',
-        title: `Bài tập ${index + 1}: Gõ mã nguồn`,
-        instruction: 'Nhìn đoạn code mẫu ở trên và gõ lại chính xác vào ô bên dưới.',
-        code: block,
-      }));
+      // 2. Tạo levels cho từng khối code
+      const levels = [];
+      let levelId = 1;
+
+      rawBlocks.forEach((block, index) => {
+        // Trích xuất comment để làm mô tả/giải thích hàm
+        const commentMatch = block.match(/(?:\/\/\/?\s*(.*)\n)+/);
+        let description = 'Không có mô tả chi tiết cho khối lệnh này.';
+        let funcName = `Khối code ${index + 1}`;
+        
+        if (commentMatch) {
+          description = commentMatch[0].replace(/\/\/\/?\s*/g, '').trim();
+        }
+
+        // Cố gắng tìm tên hàm/struct
+        const nameMatch = block.match(/(?:fun|struct)\s+([a-zA-Z0-9_]+)/);
+        if (nameMatch) {
+          funcName = nameMatch[1];
+        } else if (block.includes('const ')) {
+          funcName = 'Khai báo hằng số';
+        }
+
+        // Tạo bài tập Gõ Code (Typing)
+        levels.push({
+          id: levelId++,
+          type: 'typing',
+          title: `Luyện Gõ: ${funcName}`,
+          instruction: 'Gõ lại chính xác đoạn mã nguồn này.',
+          description: description,
+          code: block,
+        });
+
+        // Tạo ngẫu nhiên một câu hỏi trắc nghiệm (Quiz) cho một số khối (để kết hợp học và chơi)
+        if (nameMatch && Math.random() > 0.3) {
+          levels.push({
+            id: levelId++,
+            type: 'quiz',
+            title: `Trắc nghiệm: ${funcName}`,
+            instruction: 'Dựa vào đoạn code vừa gõ, hãy chọn đáp án đúng.',
+            question: `Chức năng chính hoặc thành phần của '${funcName}' là gì?`,
+            options: [
+              description.substring(0, 100) + (description.length > 100 ? '...' : ''),
+              'Để xóa dữ liệu khỏi bộ nhớ.',
+              'Trả về lỗi EHashAlreadyExists trong mọi trường hợp.',
+              'Không có tác dụng gì, chỉ để test.'
+            ].sort(() => Math.random() - 0.5),
+            answer: description.substring(0, 100) + (description.length > 100 ? '...' : ''),
+            code: block // Vẫn hiển thị code để tham khảo
+          });
+        }
+      });
 
       // Bài tập cuối: Sắp xếp lại toàn bộ các block
       if (rawBlocks.length > 1) {
@@ -30,27 +70,27 @@ export const analyzeCode = async (code) => {
         })).sort(() => Math.random() - 0.5);
 
         levels.push({
-          id: levels.length + 1,
+          id: levelId++,
           type: 'sort',
-          title: 'Bài tập Cuối: Sắp xếp Logic',
-          instruction: 'Kéo thả các khối code về đúng thứ tự ban đầu để hoàn thành chương trình.',
+          title: 'Nhiệm Vụ Cuối: Lắp Ráp Logic',
+          instruction: 'Kéo thả các khối code về đúng thứ tự ban đầu để hệ thống hoạt động.',
           blocks: shuffledBlocks,
           correctOrder: rawBlocks.map((_, i) => `b${i}`)
         });
       }
 
-      // Nếu không chia được block nào, lấy toàn bộ code làm 1 bài
       if (levels.length === 0) {
         levels.push({
           id: 1,
           type: 'typing',
-          title: 'Bài tập 1: Gõ mã nguồn',
-          instruction: 'Nhìn đoạn code mẫu ở trên và gõ lại chính xác vào ô bên dưới.',
+          title: 'Luyện Gõ: Toàn bộ Code',
+          instruction: 'Gõ lại chính xác mã nguồn vào ô bên dưới.',
+          description: 'Mã nguồn nguyên bản.',
           code: code.trim(),
         });
       }
 
       resolve(levels);
-    }, 1500); // Delay 1.5s
+    }, 1500); 
   });
 };
