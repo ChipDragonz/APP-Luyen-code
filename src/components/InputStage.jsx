@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Code2, Github, CheckSquare, Square, FolderGit2 } from 'lucide-react';
+import { Play, Code2, Folder, CheckSquare, Square } from 'lucide-react';
 
 export default function InputStage({ onSubmit }) {
   const [code, setCode] = useState('');
@@ -91,7 +91,7 @@ export default function InputStage({ onSubmit }) {
           disabled={isFetchingTree}
           style={{ width: '100%', marginBottom: '1.5rem', justifyContent: 'center' }}
         >
-          <Github size={18} />
+          <Folder size={18} />
           {isFetchingTree ? 'Đang đọc Repo...' : 'Quét danh sách file từ Github Repo'}
         </button>
       )}
@@ -99,7 +99,7 @@ export default function InputStage({ onSubmit }) {
       {githubFiles.length > 0 && (
         <div style={{ backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: '0.5rem', border: '1px solid var(--border-color)', marginBottom: '1.5rem', maxHeight: '300px', overflowY: 'auto' }}>
           <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'sticky', top: 0, backgroundColor: 'var(--card-bg)', zIndex: 1 }}>
-            <FolderGit2 size={18} color="var(--primary-color)" />
+            <Folder size={18} color="var(--primary-color)" />
             <h4 style={{ margin: 0, fontSize: '0.9rem' }}>Chọn các file bạn muốn luyện tập ({selectedFiles.length}/{githubFiles.length})</h4>
           </div>
           <div style={{ padding: '0.5rem' }}>
