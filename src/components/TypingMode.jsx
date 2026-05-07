@@ -13,13 +13,13 @@ export default function TypingMode({ exercise, onComplete }) {
   const textareaRef = useRef(null);
 
   // Balloon Mini-Game State
-  const [balloonCap, setBalloonCap] = useState(10);
+  const [balloonCap, setBalloonCap] = useState(30);
   const [balloonLetters, setBalloonLetters] = useState([]);
   const [popEffect, setPopEffect] = useState(false);
   const balloonRef = useRef(null);
 
   useEffect(() => {
-    setBalloonCap(Math.floor(Math.random() * 15) + 5);
+    setBalloonCap(Math.floor(Math.random() * 30) + 30); // 30 đến 60 ký tự
   }, []);
 
   // Focus textarea when component mounts
@@ -36,6 +36,7 @@ export default function TypingMode({ exercise, onComplete }) {
     setStartTime(null);
     setEndTime(null);
     setMistakes(0);
+    setBalloonLetters([]);
   }, [exercise]);
 
   useEffect(() => {
@@ -84,7 +85,14 @@ export default function TypingMode({ exercise, onComplete }) {
         // Balloon logic
         if (typedChar.trim() !== '') {
           setBalloonLetters(prev => {
-            const next = [...prev, typedChar];
+            const next = [...prev, {
+              id: Date.now() + Math.random(),
+              char: typedChar,
+              bottom: 10 + Math.random() * 50,
+              left: 15 + Math.random() * (30 + prev.length * 1.5),
+              rotate: Math.random() * 360
+            }];
+            
             if (next.length >= balloonCap) {
               // Pop balloon
               setTimeout(() => {
@@ -93,13 +101,13 @@ export default function TypingMode({ exercise, onComplete }) {
                 if (balloonRef.current) {
                   const rect = balloonRef.current.getBoundingClientRect();
                   confetti({
-                    particleCount: 50,
-                    spread: 80,
+                    particleCount: 70,
+                    spread: 100,
                     origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight }
                   });
                 }
                 setTimeout(() => {
-                  setBalloonCap(Math.floor(Math.random() * 15) + 5);
+                  setBalloonCap(Math.floor(Math.random() * 30) + 30);
                   setBalloonLetters([]);
                   setPopEffect(false);
                 }, 300);
@@ -222,7 +230,7 @@ export default function TypingMode({ exercise, onComplete }) {
       {createPortal(
         <div style={{
           position: 'fixed',
-          right: '2rem',
+          right: '6rem',
           top: '50%',
           transform: 'translateY(-50%)',
           display: 'flex',
@@ -250,18 +258,18 @@ export default function TypingMode({ exercise, onComplete }) {
               transform: `scale(${popEffect ? 1.5 : 1}) translateY(${popEffect ? '-20px' : '0'})`
             }}
           >
-            {balloonLetters.map((char, i) => (
-              <span key={i} style={{ 
+            {balloonLetters.map((item) => (
+              <span key={item.id} style={{ 
                 position: 'absolute', 
-                bottom: `${10 + Math.random() * 40}px`, 
-                left: `${10 + Math.random() * (40 + balloonLetters.length * 2)}px`, 
+                bottom: `${item.bottom}px`, 
+                left: `${item.left}px`, 
                 color: '#0a0a0a', 
                 fontWeight: 'bold',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '1.2rem',
-                transform: `rotate(${Math.random() * 360}deg)`,
-                transition: 'all 0.2s'
-              }}>{char}</span>
+                transform: `rotate(${item.rotate}deg)`,
+                transition: 'none' // Disable transition so it doesn't jump
+              }}>{item.char}</span>
             ))}
           </div>
           {/* Dây bóng */}
