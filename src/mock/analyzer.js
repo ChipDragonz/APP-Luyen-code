@@ -2,44 +2,88 @@
 export const analyzeCode = async (code) => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      // Create a few levels based on the code length or just return fixed mock data for demo.
-      // In a real app, an LLM would parse the code and return structured exercises.
+      // TẠO BÀI TẬP 1: ĐIỀN TỪ (TYPING MODE)
+      const keywordsToHide = ['struct', 'fun', 'public', 'entry', 'mut', 'const', 'use', 'return', 'function', 'import', 'export', 'default', 'let'];
       
+      let snippet = [];
+      // Split by word boundaries to identify keywords without breaking symbols
+      const tokens = code.split(/(\b)/); 
+      
+      let keywordCount = 0;
+      tokens.forEach(token => {
+        if (keywordsToHide.includes(token) && keywordCount < 10) { // Giấu tối đa 10 từ khóa
+          snippet.push({ type: 'input', answer: token, placeholder: 'từ khóa' });
+          keywordCount++;
+        } else {
+          if (snippet.length > 0 && snippet[snippet.length - 1].type === 'text') {
+            snippet[snippet.length - 1].content += token;
+          } else {
+            snippet.push({ type: 'text', content: token });
+          }
+        }
+      });
+
+      // Đảm bảo nếu không có keyword, ta không bị lỗi
+      if (keywordCount === 0) {
+        const words = code.split(' ');
+        if (words.length > 1) {
+          snippet = [
+            { type: 'text', content: words.slice(0, words.length - 1).join(' ') + ' ' },
+            { type: 'input', answer: words[words.length - 1], placeholder: '...' }
+          ];
+        } else {
+           snippet = [{ type: 'text', content: code }];
+        }
+      }
+
+      // TẠO BÀI TẬP 2: SẮP XẾP (SORT MODE)
+      // Chia block theo dòng trắng (double newline)
+      let rawBlocks = code.split('\n\n').filter(b => b.trim().length > 0);
+      
+      // Nếu code không có dòng trắng, chia theo từng dòng
+      if (rawBlocks.length < 3) {
+        rawBlocks = code.split('\n').filter(b => b.trim().length > 0);
+      }
+
+      // Nhóm bớt nếu số lượng quá nhiều (tối đa ~6 khối để dễ chơi)
+      if (rawBlocks.length > 6) {
+        const mergedBlocks = [];
+        const chunkSize = Math.ceil(rawBlocks.length / 5);
+        for (let i = 0; i < rawBlocks.length; i += chunkSize) {
+          mergedBlocks.push(rawBlocks.slice(i, i + chunkSize).join('\n'));
+        }
+        rawBlocks = mergedBlocks;
+      }
+
+      const correctOrderIds = rawBlocks.map((_, i) => `b${i}`);
+      const blocks = rawBlocks.map((content, i) => ({
+        id: `b${i}`,
+        content: content
+      }));
+
+      // Xáo trộn blocks
+      const shuffledBlocks = [...blocks].sort(() => Math.random() - 0.5);
+
       const levels = [
         {
           id: 1,
           type: 'typing',
-          title: 'Fill in the blanks',
-          instruction: 'Complete the missing keywords or variables in the code snippet.',
+          title: 'Điền từ khóa',
+          instruction: 'Nhập chính xác các từ khóa hoặc cú pháp quan trọng bị thiếu trong đoạn code bên dưới.',
           code: code,
-          // We'll mock missing parts. Let's just create a dummy representation.
-          // For the sake of the demo, we will pretend the code is a React component and we hide "function" and "return"
-          // If the user's code is generic, we just use a fallback mock snippet to ensure the UI works.
-          snippet: [
-            { type: 'text', content: 'export default ' },
-            { type: 'input', answer: 'function', placeholder: 'keyword' },
-            { type: 'text', content: ' App() {\n  const [count, setCount] = useState(0);\n\n  ' },
-            { type: 'input', answer: 'return', placeholder: 'keyword' },
-            { type: 'text', content: ' (\n    <div>Hello World</div>\n  );\n}' }
-          ]
+          snippet: snippet
         },
         {
           id: 2,
           type: 'sort',
-          title: 'Logical Ordering',
-          instruction: 'Drag and drop the code blocks into the correct execution order.',
-          blocks: [
-            { id: 'b1', content: 'import React, { useState } from "react";' },
-            { id: 'b2', content: 'export default function Counter() {' },
-            { id: 'b3', content: '  const [count, setCount] = useState(0);' },
-            { id: 'b4', content: '  return <button onClick={() => setCount(count + 1)}>{count}</button>;' },
-            { id: 'b5', content: '}' }
-          ].sort(() => Math.random() - 0.5), // Shuffle them
-          correctOrder: ['b1', 'b2', 'b3', 'b4', 'b5']
+          title: 'Sắp xếp Logic',
+          instruction: 'Kéo thả các khối code về đúng thứ tự ban đầu.',
+          blocks: shuffledBlocks,
+          correctOrder: correctOrderIds
         }
       ];
 
       resolve(levels);
-    }, 2000); // Simulate 2s delay
+    }, 2000); // Delay 2s giả lập
   });
 };

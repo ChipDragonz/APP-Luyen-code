@@ -14,15 +14,15 @@ export default function InputStage({ onSubmit }) {
     <div className="glass-card fade-in">
       <div className="header">
         <div>
-          <h2 className="title">Code Mastery Mini-Game</h2>
-          <p style={{ color: 'var(--border-color)', marginTop: '0.5rem' }}>Paste your code below to generate interactive learning exercises.</p>
+          <h2 className="title">Mini-Game Luyện Code</h2>
+          <p style={{ color: 'var(--border-color)', marginTop: '0.5rem' }}>Dán đoạn code của bạn vào đây để tạo các bài tập tương tác.</p>
         </div>
         <Code2 size={32} color="var(--primary-color)" />
       </div>
 
       <textarea
         className="input-area"
-        placeholder="Paste your code here... (e.g. JavaScript, Python, React components)"
+        placeholder="Dán code của bạn vào đây... (ví dụ: Move, JavaScript, Python, C++)"
         value={code}
         onChange={(e) => setCode(e.target.value)}
         spellCheck="false"
@@ -35,7 +35,7 @@ export default function InputStage({ onSubmit }) {
           disabled={!code.trim()}
         >
           <Play size={18} />
-          Generate Exercise
+          Tạo Bài Tập
         </button>
       </div>
     </div>

@@ -31,7 +31,7 @@ export default function TypingMode({ exercise, onComplete }) {
 
   return (
     <div className="fade-in">
-      <div className="mode-badge">Mode 1: Recall & Type</div>
+      <div className="mode-badge">Chế độ 1: Gợi Nhớ & Nhập Liệu</div>
       <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{exercise.title}</h3>
       <p style={{ color: 'var(--border-color)', marginBottom: '1.5rem' }}>{exercise.instruction}</p>
 
@@ -60,14 +60,14 @@ export default function TypingMode({ exercise, onComplete }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isAllCorrect ? 'var(--success-color)' : 'var(--text-color)' }}>
           {isAllCorrect && <CheckCircle2 size={20} />}
-          <span>{isAllCorrect ? 'Perfect! You can proceed.' : 'Fill all blanks correctly to proceed.'}</span>
+          <span>{isAllCorrect ? 'Chính xác! Bạn có thể tiếp tục.' : 'Điền đúng tất cả các chỗ trống để tiếp tục.'}</span>
         </div>
         <button 
           className="btn btn-primary" 
           onClick={onComplete}
           disabled={!isAllCorrect}
         >
-          Next Challenge
+          Thử Thách Tiếp Theo
           <ArrowRight size={18} />
         </button>
       </div>

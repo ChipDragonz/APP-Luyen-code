@@ -76,7 +76,7 @@ export default function SortMode({ exercise, onComplete }) {
 
   return (
     <div className="fade-in">
-      <div className="mode-badge">Mode 2: Logical Ordering</div>
+      <div className="mode-badge">Chế độ 2: Sắp xếp Logic</div>
       <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{exercise.title}</h3>
       <p style={{ color: 'var(--border-color)', marginBottom: '1.5rem' }}>{exercise.instruction}</p>
 
@@ -100,14 +100,14 @@ export default function SortMode({ exercise, onComplete }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isCorrect ? 'var(--success-color)' : 'var(--text-color)' }}>
           {isCorrect && <CheckCircle2 size={20} />}
-          <span>{isCorrect ? 'Correct order! Well done.' : 'Drag blocks to arrange them correctly.'}</span>
+          <span>{isCorrect ? 'Thứ tự chính xác! Làm tốt lắm.' : 'Kéo thả các khối code để sắp xếp lại cho đúng.'}</span>
         </div>
         <button 
           className="btn btn-primary" 
           onClick={onComplete}
           disabled={!isCorrect}
         >
-          Next Challenge
+          Thử Thách Tiếp Theo
           <ArrowRight size={18} />
         </button>
       </div>

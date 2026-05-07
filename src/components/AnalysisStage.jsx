@@ -15,8 +15,8 @@ export default function AnalysisStage() {
     <div className="glass-card fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', textAlign: 'center' }}>
       <div className="loader"></div>
       <Cpu size={48} color="var(--primary-color)" style={{ marginBottom: '1rem' }} />
-      <h2 style={{ marginBottom: '0.5rem' }}>Analyzing AI Syntactics</h2>
-      <p style={{ color: 'var(--border-color)' }}>Generating personalized exercises based on your code{dots}</p>
+      <h2 style={{ marginBottom: '0.5rem' }}>Trí tuệ nhân tạo đang phân tích</h2>
+      <p style={{ color: 'var(--border-color)' }}>Đang tạo các bài tập cá nhân hóa dựa trên code của bạn{dots}</p>
     </div>
   );
 }

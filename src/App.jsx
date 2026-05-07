@@ -57,7 +57,7 @@ function App() {
           onClick={toggleDarkMode} 
           className="btn btn-outline"
           style={{ padding: '0.5rem' }}
-          aria-label="Toggle Dark Mode"
+          aria-label="Chuyển đổi giao diện Sáng/Tối"
         >
           {darkMode ? <Sun size={20} /> : <Moon size={20} />}
         </button>
@@ -80,7 +80,7 @@ function App() {
             </div>
             
             <div style={{ marginBottom: '1rem', color: 'var(--border-color)', fontSize: '0.875rem' }}>
-              Level {currentLevelIndex + 1} of {levels.length}
+              Màn {currentLevelIndex + 1} / {levels.length}
             </div>
 
             {levels[currentLevelIndex].type === 'typing' && (
@@ -102,13 +102,13 @@ function App() {
         {stage === 'success' && (
           <div className="glass-card fade-in success-message">
             <Trophy className="success-icon" />
-            <h2 className="title" style={{ fontSize: '2rem' }}>Mastery Achieved!</h2>
+            <h2 className="title" style={{ fontSize: '2rem' }}>Chinh Phục Thành Công!</h2>
             <p style={{ color: 'var(--border-color)', fontSize: '1.1rem', maxWidth: '400px' }}>
-              You have successfully completed all exercises for this code snippet.
+              Bạn đã hoàn thành xuất sắc tất cả các bài tập cho đoạn code này.
             </p>
             <button className="btn btn-primary" onClick={handleReset} style={{ marginTop: '1.5rem' }}>
               <RefreshCw size={18} />
-              Train Another Code
+              Thực hành với đoạn code khác
             </button>
           </div>
         )}
