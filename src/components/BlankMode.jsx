@@ -7,9 +7,10 @@ export default function BlankMode({ exercise, onComplete }) {
   const [blanks, setBlanks] = useState([]);
   const [userInputs, setUserInputs] = useState({});
   const [isCorrect, setIsCorrect] = useState(false);
+  const [parsedParts, setParsedParts] = useState([]);
 
   // Khởi tạo các ô trống dựa trên code gốc
-  const parsedCode = useMemo(() => {
+  useEffect(() => {
     // Regex tìm các từ khóa, biến, tên hàm...
     const wordRegex = /\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g;
     let match;
@@ -40,7 +41,8 @@ export default function BlankMode({ exercise, onComplete }) {
     });
     parts.push({ type: 'text', content: exercise.code.substring(lastIdx) });
 
-    return parts;
+    setParsedParts(parts);
+    setIsCorrect(false);
   }, [exercise.code]);
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export default function BlankMode({ exercise, onComplete }) {
       <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Đọc đoạn code dưới đây và điền vào chỗ trống những từ khóa bị thiếu.</p>
 
       <div className="code-display" style={{ marginBottom: '1.5rem', backgroundColor: '#1e1e1e', fontFamily: 'var(--font-mono)', whiteSpace: 'pre-wrap', lineHeight: '2' }}>
-        {parsedCode.map((part, idx) => {
+        {parsedParts.map((part, idx) => {
           if (part.type === 'text') {
             return <span key={idx} style={{ color: '#d4d4d4' }}>{part.content}</span>;
           } else {
