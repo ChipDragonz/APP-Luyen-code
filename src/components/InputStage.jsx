@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
-import { Play, Code2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Play, Code2, Key } from 'lucide-react';
 
 export default function InputStage({ onSubmit }) {
   const [code, setCode] = useState('');
+  const [apiKey, setApiKey] = useState('');
+
+  useEffect(() => {
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) setApiKey(savedKey);
+  }, []);
 
   const handleSubmit = () => {
     if (code.trim()) {
-      onSubmit(code);
+      if (apiKey) localStorage.setItem('gemini_api_key', apiKey);
+      onSubmit(code, apiKey);
     }
   };
 
@@ -26,9 +33,29 @@ export default function InputStage({ onSubmit }) {
         value={code}
         onChange={(e) => setCode(e.target.value)}
         spellCheck="false"
+        style={{ minHeight: '250px' }}
       />
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, marginRight: '1rem' }}>
+          <Key size={18} color="var(--text-muted)" />
+          <input 
+            type="password" 
+            placeholder="Google Gemini API Key (Tùy chọn - để phân tích bằng AI thật)"
+            style={{ 
+              flex: 1, 
+              padding: '0.5rem', 
+              borderRadius: '0.25rem', 
+              border: '1px solid var(--border-color)', 
+              backgroundColor: 'var(--code-bg)', 
+              color: 'var(--text-color)',
+              fontFamily: 'var(--font-mono)'
+            }}
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+          />
+        </div>
+        
         <button 
           className="btn btn-primary" 
           onClick={handleSubmit}
