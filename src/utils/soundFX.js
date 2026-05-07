@@ -108,43 +108,58 @@ export const playSuccessSound = () => {
 export const spawnStar = () => {
   const star = document.createElement('div');
   
-  // Style trực tiếp để không cần sửa CSS
   star.style.position = 'fixed';
-  star.style.width = '2px';
-  star.style.height = `${40 + Math.random() * 40}px`;
-  star.style.background = 'linear-gradient(to bottom, transparent, var(--primary-color))';
-  star.style.filter = 'drop-shadow(0 0 5px var(--primary-color))';
-  star.style.borderRadius = '2px';
+  star.style.width = '3px'; // Dày hơn
+  star.style.height = `${80 + Math.random() * 40}px`;
+  star.style.background = 'linear-gradient(to bottom, transparent, #00ff41, #ffffff)'; // Sáng hơn
+  star.style.filter = 'drop-shadow(0 0 10px #00ff41) drop-shadow(0 0 20px #00ff41)'; // Viền sáng rực rỡ
+  star.style.borderRadius = '3px';
   star.style.pointerEvents = 'none';
-  star.style.zIndex = '0'; // Chìm dưới các card kính
+  star.style.zIndex = '10'; // Nổi lên trên
   
-  // Vị trí xuất phát ngẫu nhiên trên cùng màn hình
   const startX = Math.random() * window.innerWidth;
-  const startY = -100; // Bắt đầu cao hơn màn hình một chút
+  const startY = -150; 
   
   star.style.left = `${startX}px`;
   star.style.top = `${startY}px`;
   
-  // Góc rơi chéo nhẹ từ phải sang trái
-  const angle = 25 + Math.random() * 10;
+  const angle = 20 + Math.random() * 15;
   star.style.transform = `rotate(${angle}deg)`;
   
   document.body.appendChild(star);
   
-  const duration = 400 + Math.random() * 400; // Rơi rất nhanh (400-800ms)
-  const distanceX = -window.innerHeight * Math.tan(angle * Math.PI / 180);
+  const duration = 1200 + Math.random() * 1000; // Rơi chậm lại (1.2s - 2.2s)
+  const distanceX = -(window.innerHeight + 300) * Math.tan(angle * Math.PI / 180);
   
   star.animate([
     { transform: `translate(0, 0) rotate(${angle}deg)`, opacity: 1 },
-    { transform: `translate(${distanceX}px, ${window.innerHeight + 200}px) rotate(${angle}deg)`, opacity: 0.2 }
+    { transform: `translate(${distanceX}px, ${window.innerHeight + 300}px) rotate(${angle}deg)`, opacity: 0 }
   ], {
     duration: duration,
     easing: 'linear',
     fill: 'forwards'
   });
   
-  // Dọn dẹp DOM sau khi rơi xong
   setTimeout(() => {
     star.remove();
   }, duration);
+};
+
+// Âm thanh bóng nổ (Pop)
+export const playPopSound = () => {
+  initAudio();
+  const osc = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.1);
+  
+  gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+  
+  osc.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.1);
 };
