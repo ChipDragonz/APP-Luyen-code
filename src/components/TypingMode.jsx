@@ -6,7 +6,9 @@ import { playClickSound, playErrorSound, playSuccessSound } from '../utils/sound
 export default function TypingMode({ exercise, onComplete }) {
   const [userInput, setUserInput] = useState('');
   const [isCorrect, setIsCorrect] = useState(false);
-  const textareaRef = useRef(null);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+  const [mistakes, setMistakes] = useState(0);
 
   // Focus textarea when component mounts
   useEffect(() => {
@@ -19,11 +21,15 @@ export default function TypingMode({ exercise, onComplete }) {
   useEffect(() => {
     setUserInput('');
     setIsCorrect(false);
+    setStartTime(null);
+    setEndTime(null);
+    setMistakes(0);
   }, [exercise]);
 
   useEffect(() => {
     if (userInput === exercise.code && exercise.code.length > 0) {
       setIsCorrect(true);
+      setEndTime(Date.now());
       playSuccessSound();
       confetti({
         particleCount: 100,
@@ -31,6 +37,21 @@ export default function TypingMode({ exercise, onComplete }) {
         origin: { y: 0.6 },
         colors: ['#00ff41', '#00cc33', '#ffffff']
       });
+
+      // Calculate stats to trigger Companion
+      const timeSec = (Date.now() - startTime) / 1000 || 1;
+      const wpm = Math.round((exercise.code.length / 5) / (timeSec / 60));
+      const acc = Math.max(0, Math.round(((exercise.code.length - mistakes) / exercise.code.length) * 100));
+      
+      let rank = 'C';
+      if (wpm > 80 && acc > 95) rank = 'S';
+      else if (wpm > 50 && acc > 90) rank = 'A';
+      else if (wpm > 30 && acc > 80) rank = 'B';
+
+      if (rank === 'S') window.dispatchEvent(new CustomEvent('companion_message', { detail: 'Tuyệt vời! Rank S luôn, múa phím như hacker phim điện ảnh!' }));
+      else if (rank === 'A') window.dispatchEvent(new CustomEvent('companion_message', { detail: 'Khá lắm! Cố xíu nữa là lên Rank S rồi.' }));
+      else window.dispatchEvent(new CustomEvent('companion_message', { detail: `Bạn đạt Rank ${rank}. Hãy gõ nhanh và chuẩn hơn nữa nhé!` }));
+      
     } else {
       setIsCorrect(false);
     }
@@ -38,6 +59,7 @@ export default function TypingMode({ exercise, onComplete }) {
 
   const handleChange = (e) => {
     const newVal = e.target.value;
+    if (!startTime) setStartTime(Date.now());
     
     // Play sound based on input correctness
     if (newVal.length > userInput.length) {
@@ -46,6 +68,10 @@ export default function TypingMode({ exercise, onComplete }) {
         playClickSound();
       } else {
         playErrorSound();
+        setMistakes(m => m + 1);
+        if (Math.random() > 0.7) {
+          window.dispatchEvent(new CustomEvent('companion_message', { detail: 'Ái chà, gõ nhầm rồi kìa sếp!' }));
+        }
       }
     } else if (newVal.length < userInput.length) {
       playClickSound(); // Backspace sound
@@ -133,14 +159,37 @@ export default function TypingMode({ exercise, onComplete }) {
     return chars;
   }, [exercise.code]);
 
+  const stats = useMemo(() => {
+    if (!startTime || !endTime) return null;
+    const timeSec = (endTime - startTime) / 1000 || 1;
+    const wpm = Math.round((exercise.code.length / 5) / (timeSec / 60));
+    const acc = Math.max(0, Math.round(((exercise.code.length - mistakes) / exercise.code.length) * 100));
+    let rank = 'C';
+    let rankColor = '#8b949e';
+    if (wpm > 80 && acc > 95) { rank = 'S'; rankColor = '#eab308'; } // Vàng
+    else if (wpm > 50 && acc > 90) { rank = 'A'; rankColor = '#a855f7'; } // Tím
+    else if (wpm > 30 && acc > 80) { rank = 'B'; rankColor = '#3b82f6'; } // Xanh dương
+
+    return { wpm, acc, rank, rankColor };
+  }, [startTime, endTime, mistakes, exercise.code.length]);
+
   return (
     <div className="fade-in">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-        <div className="mode-badge" style={{ margin: 0 }}>Luyện gõ Code</div>
-        {exercise.filePath && (
-          <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>
-            📄 {exercise.filePath}
-          </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div className="mode-badge" style={{ margin: 0 }}>Luyện gõ Code</div>
+          {exercise.filePath && (
+            <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>
+              📄 {exercise.filePath}
+            </div>
+          )}
+        </div>
+        
+        {/* Live WPM Indicator (thô) */}
+        {startTime && !isCorrect && (
+           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Lỗi: <span style={{ color: mistakes > 0 ? 'var(--error-color)' : 'var(--text-muted)' }}>{mistakes}</span>
+           </div>
         )}
       </div>
       <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{exercise.title}</h3>
@@ -156,25 +205,22 @@ export default function TypingMode({ exercise, onComplete }) {
             const { char, syntaxColor } = item;
             let displayColor = syntaxColor;
             let backgroundColor = 'transparent';
-            let opacity = 1; // Sáng rõ hoàn toàn cho code mẫu
+            let opacity = 1; 
 
             if (index < userInput.length) {
               if (userInput[index] === char) {
-                // Đã gõ đúng: mờ đi một chút để tập trung vào phần chưa gõ
                 displayColor = syntaxColor; 
                 opacity = 0.6;
               } else {
                 displayColor = 'white';
-                backgroundColor = '#f85149'; // Sai
+                backgroundColor = '#f85149'; 
                 opacity = 1;
               }
             } else if (index > userInput.length) {
-              // Chưa gõ: Giữ nguyên màu sắc rực rỡ của VS Code
               displayColor = syntaxColor;
               opacity = 1;
             }
 
-            // Highlight con trỏ hiện tại
             if (index === userInput.length && !isCorrect) {
               backgroundColor = 'rgba(255, 255, 255, 0.3)';
               opacity = 1;
@@ -202,13 +248,21 @@ export default function TypingMode({ exercise, onComplete }) {
       />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isCorrect ? 'var(--success-color)' : 'var(--text-color)' }}>
-          {isCorrect && <CheckCircle2 size={20} />}
-          <span>
-            {isCorrect 
-              ? 'Hoàn hảo! Bạn gõ chính xác 100%.' 
-              : `Đã gõ: ${userInput.length} / ${exercise.code.length} ký tự`}
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: isCorrect ? 'var(--success-color)' : 'var(--text-color)' }}>
+          {isCorrect ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', animation: 'scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}>
+               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>RANK</span>
+                 <span style={{ fontSize: '2.5rem', fontWeight: 'bold', color: stats.rankColor, textShadow: `0 0 10px ${stats.rankColor}88` }}>{stats.rank}</span>
+               </div>
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                 <span style={{ fontSize: '0.9rem' }}>Tốc độ: <strong>{stats.wpm} WPM</strong></span>
+                 <span style={{ fontSize: '0.9rem' }}>Độ chính xác: <strong>{stats.acc}%</strong></span>
+               </div>
+            </div>
+          ) : (
+            <span>Đã gõ: {userInput.length} / {exercise.code.length} ký tự</span>
+          )}
         </div>
         <button 
           className="btn btn-primary" 

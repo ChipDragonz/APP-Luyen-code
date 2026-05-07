@@ -115,11 +115,13 @@ ${finalCode}
 
       // Xử lý dữ liệu AI trả về thành dạng bài tập
       aiBlocks.forEach((block, index) => {
+        const isBlankMode = Math.random() < 0.3;
+
         levels.push({
           id: levelId++,
-          type: 'typing',
-          title: `Luyện Gõ: ${block.name}`,
-          instruction: 'Gõ lại chính xác đoạn mã nguồn này.',
+          type: isBlankMode ? 'fill_blank' : 'typing',
+          title: isBlankMode ? `Điền Trống: ${block.name}` : `Luyện Gõ: ${block.name}`,
+          instruction: isBlankMode ? 'Hoàn thành các ô trống bằng cách điền từ khóa chính xác.' : 'Gõ lại chính xác đoạn mã nguồn này.',
           description: block.description,
           filePath: block.file_path || '',
           code: block.code.trim(),
@@ -205,18 +207,20 @@ ${finalCode}
         } else if (block.includes('const ')) {
           funcName = 'Khai báo hằng số';
         }
+        }
 
-        const cleanCode = block.replace(/\/\/.*/g, '').trim();
+        const blockCode = block.replace(/\/\/.*/g, '').trim();
+        if (blockCode.length === 0) return; // Bỏ qua nếu block chỉ toàn comment
 
-        if (cleanCode.length === 0) return; // Bỏ qua nếu block chỉ toàn comment
-
+        const isBlankMode = Math.random() < 0.3;
         levels.push({
           id: levelId++,
-          type: 'typing',
-          title: `Luyện Gõ: ${funcName}`,
-          instruction: 'Gõ lại chính xác đoạn mã nguồn này.',
+          type: isBlankMode ? 'fill_blank' : 'typing',
+          title: isBlankMode ? `Điền Trống: ${funcName}` : `Luyện Gõ: ${funcName}`,
+          instruction: isBlankMode ? 'Hoàn thành các ô trống bằng cách điền từ khóa chính xác.' : 'Gõ lại chính xác đoạn mã nguồn này.',
           description: description,
-          code: cleanCode,
+          filePath: currentFilePath,
+          code: blockCode,
         });
 
         if (nameMatch && Math.random() > 0.3) {
