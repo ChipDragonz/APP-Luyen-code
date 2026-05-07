@@ -126,26 +126,27 @@ export default function TypingMode({ exercise, onComplete }) {
             const { char, syntaxColor } = item;
             let displayColor = syntaxColor;
             let backgroundColor = 'transparent';
-            let opacity = 0.5; // Chưa gõ
+            let opacity = 1; // Sáng rõ hoàn toàn cho code mẫu
 
             if (index < userInput.length) {
-              opacity = 1;
               if (userInput[index] === char) {
-                // Nếu gõ đúng, sáng lên với màu syntax của VS Code
+                // Đã gõ đúng: mờ đi một chút để tập trung vào phần chưa gõ
                 displayColor = syntaxColor; 
+                opacity = 0.6;
               } else {
                 displayColor = 'white';
                 backgroundColor = '#f85149'; // Sai
+                opacity = 1;
               }
             } else if (index > userInput.length) {
-              // Làm tối màu syntax đi nếu chưa gõ tới để tập trung vào chỗ con trỏ
+              // Chưa gõ: Giữ nguyên màu sắc rực rỡ của VS Code
               displayColor = syntaxColor;
-              opacity = 0.4;
+              opacity = 1;
             }
 
             // Highlight con trỏ hiện tại
             if (index === userInput.length && !isCorrect) {
-              backgroundColor = 'rgba(255, 255, 255, 0.2)';
+              backgroundColor = 'rgba(255, 255, 255, 0.3)';
               opacity = 1;
             }
 
