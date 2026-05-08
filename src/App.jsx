@@ -185,10 +185,10 @@ function App() {
       <div style={{
         position: 'fixed',
         bottom: '15px',
-        right: '15px',
+        left: '15px', /* Chuyển sang trái để không đè lên Bot */
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-end',
+        alignItems: 'flex-start', /* Đổi căn lề sang trái */
         gap: '5px',
         fontSize: '0.8rem',
         fontFamily: 'var(--font-mono)',
@@ -197,7 +197,7 @@ function App() {
         backgroundColor: 'rgba(5, 5, 5, 0.8)',
         padding: '10px 15px',
         border: '1px solid var(--primary-color)',
-        borderRight: '4px solid var(--primary-color)',
+        borderLeft: '4px solid var(--primary-color)', /* Đổi viền sang trái */
         boxShadow: '0 0 10px rgba(252, 226, 5, 0.2)'
       }}>
         <a href="https://github.com/ChipDragonz/APP-Luyen-code" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-hover)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '5px' }}>

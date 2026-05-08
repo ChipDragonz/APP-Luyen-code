@@ -1,16 +1,46 @@
-# React + Vite
+# Hacker CodeQuest 2077 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hacker CodeQuest là một nền tảng học tập kết hợp game hóa (Gamification) dành cho lập trình viên, mang phong cách Retro Cyberpunk x Synthwave 80s siêu ngầu!
 
-Currently, two official plugins are available:
+![CodeQuest Theme](https://img.shields.io/badge/Theme-Cyberpunk_x_Synthwave-fce205?style=flat-square&logo=react)
+![Vite](https://img.shields.io/badge/Vite-React-646CFF?style=flat-square&logo=vite)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tính năng nổi bật 🎮
 
-## React Compiler
+1. **AI-Driven Quests (Nhiệm vụ AI):** Dán bất kỳ đoạn code nào của bạn vào, hệ thống AI sẽ tự động phân tích và tạo ra các thử thách như:
+   - ⌨️ **Gõ Code (Typing Mode):** Luyện tốc độ gõ phím với hiệu ứng nổ bong bóng mãn nhãn và sao băng bay lượn!
+   - ❓ **Trắc Nghiệm (Quiz Mode):** Điền code còn thiếu vào các chỗ trống `___`.
+   - 🧩 **Sắp Xếp (Sort Mode):** Kéo thả các dòng code bị xáo trộn về đúng vị trí.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2. **Mini-game Bóng Bay (Persistent Balloon):**
+   - Vừa code vừa "bơm" bóng bay.
+   - Gõ càng nhiều, bóng càng to. Khi bóng nổ sẽ tạo ra hiệu ứng Confetti rực rỡ!
 
-## Expanding the ESLint configuration
+3. **Giao diện Cyberpunk 2077 x Synthwave:**
+   - Con đường cao tốc vô tận di chuyển liên tục.
+   - Mặt trời nhân tạo rực rỡ lúc hoàng hôn.
+   - Thiết kế sắc lẹm, không bo góc, ánh sáng neon rực rỡ và hiệu ứng Scanlines.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+4. **Trợ lý ảo (Companion):**
+   - Một "bot" nhỏ góc phải màn hình luôn theo dõi và cổ vũ tinh thần cho bạn.
+
+## Cài đặt và Chạy nội bộ ⚙️
+
+```bash
+# 1. Cài đặt các gói phụ thuộc
+npm install
+
+# 2. Khởi chạy server phát triển
+npm run dev
+
+# 3. Build sản phẩm (Tùy chọn)
+npm run build
+```
+
+## Đóng góp & Ủng hộ ❤️
+
+Dự án này được xây dựng vì cộng đồng. Nếu bạn thấy thích và muốn ủng hộ để tác giả có động lực nâng cấp thêm tính năng:
+
+💸 **Donate qua Vietcombank:** `1024327360`
+
+*Mọi dòng code bạn đóng góp đều giúp Night City trở nên rực rỡ hơn!*
