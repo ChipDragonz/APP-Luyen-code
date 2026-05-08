@@ -38,7 +38,18 @@ export default function QuizMode({ exercise, onComplete }) {
       </div>
 
       <div style={{ backgroundColor: 'var(--card-bg)', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid var(--primary-color)' }}>
-        <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-color)' }}>{exercise.question}</h4>
+        <div style={{ 
+          fontSize: '1.1rem', 
+          marginBottom: '1rem', 
+          color: 'var(--text-color)',
+          whiteSpace: 'pre-wrap', 
+          fontFamily: exercise.quizType === 'missing_code' ? 'var(--font-mono)' : 'inherit',
+          backgroundColor: exercise.quizType === 'missing_code' ? 'rgba(0,0,0,0.3)' : 'transparent',
+          padding: exercise.quizType === 'missing_code' ? '1rem' : '0',
+          borderRadius: '0.25rem'
+        }}>
+          {exercise.question}
+        </div>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {exercise.options.map((option, idx) => {

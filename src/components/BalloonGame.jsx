@@ -7,15 +7,18 @@ export default function BalloonGame() {
   const [balloonLetters, setBalloonLetters] = useState([]);
   const [popEffect, setPopEffect] = useState(false);
   const balloonRef = useRef(null);
+  const isPoppingRef = useRef(false);
 
   useEffect(() => {
-    setBalloonCap(Math.floor(Math.random() * 30) + 30);
+    setBalloonCap(Math.floor(Math.random() * 120) + 80);
   }, []);
 
   useEffect(() => {
     const handleTypedChar = (e) => {
       const typedChar = e.detail;
       if (typedChar.trim() !== '') {
+        if (isPoppingRef.current) return; // Đang nổ thì không nhận thêm chữ
+
         setBalloonLetters(prev => {
           const next = [...prev, {
             id: Date.now() + Math.random(),
@@ -26,21 +29,23 @@ export default function BalloonGame() {
           }];
           
           if (next.length >= balloonCap) {
+            isPoppingRef.current = true; // Khóa lại không cho nổ kép
             setTimeout(() => {
               setPopEffect(true);
               playPopSound();
               if (balloonRef.current) {
                 const rect = balloonRef.current.getBoundingClientRect();
                 confetti({
-                  particleCount: 70,
-                  spread: 100,
+                  particleCount: 150, // Nổ to hơn
+                  spread: 160,
                   origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight }
                 });
               }
               setTimeout(() => {
-                setBalloonCap(Math.floor(Math.random() * 30) + 30);
+                setBalloonCap(Math.floor(Math.random() * 120) + 80);
                 setBalloonLetters([]);
                 setPopEffect(false);
+                isPoppingRef.current = false; // Mở khóa
               }, 300);
             }, 50);
           }

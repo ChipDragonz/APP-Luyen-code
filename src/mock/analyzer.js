@@ -77,7 +77,8 @@ Mỗi phần tử trong mảng đại diện cho một khối code, có cấu tr
   "code": "đoạn code gốc của hàm/struct (chỉ lấy code lõi, XÓA HẾT COMMENT để người dùng luyện gõ sạch sẽ)",
   "name": "tên hàm hoặc struct",
   "description": "Giải thích ngắn gọn (1-2 câu tiếng Việt) chức năng của đoạn code này",
-  "quiz_question": "Một câu hỏi trắc nghiệm tiếng Việt về chức năng hoặc logic của đoạn code này",
+  "quiz_type": "Loại câu hỏi trắc nghiệm. Trả về 'logic' (nếu hỏi về chức năng) hoặc 'missing_code' (nếu hỏi điền vào chỗ trống đoạn code bị thiếu)",
+  "quiz_question": "Nếu quiz_type='logic', đặt câu hỏi chức năng. Nếu quiz_type='missing_code', hãy trích xuất một phần đoạn mã, thay thế một từ khóa/biến/logic quan trọng bằng '___' và yêu cầu chọn đáp án điền vào '___'",
   "quiz_options": ["Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4"],
   "quiz_answer": "Đáp án đúng (phải giống hệt 1 trong 4 đáp án trên)"
 }
@@ -122,7 +123,7 @@ ${finalCode}
           instruction: 'Gõ lại chính xác đoạn mã nguồn này.',
           description: block.description,
           filePath: block.file_path || '',
-          code: block.code.trim(),
+          code: block.code.split('\n').map(l => l.trimEnd()).join('\n').trim(),
         });
 
         // 50% cơ hội xuất hiện câu hỏi trắc nghiệm
@@ -130,8 +131,9 @@ ${finalCode}
           levels.push({
             id: levelId++,
             type: 'quiz',
-            title: `Trắc nghiệm: ${block.name}`,
-            instruction: 'Dựa vào đoạn code vừa gõ, hãy chọn đáp án đúng.',
+            quizType: block.quiz_type || 'logic', // Thêm trường này
+            title: block.quiz_type === 'missing_code' ? `Điền code: ${block.name}` : `Trắc nghiệm: ${block.name}`,
+            instruction: block.quiz_type === 'missing_code' ? 'Hãy chọn đoạn code đúng để điền vào chỗ trống (___).' : 'Dựa vào đoạn code vừa gõ, hãy chọn đáp án đúng.',
             question: block.quiz_question,
             options: block.quiz_options.sort(() => Math.random() - 0.5),
             answer: block.quiz_answer,
@@ -206,7 +208,10 @@ ${finalCode}
           funcName = 'Khai báo hằng số';
         }
 
-        const blockCode = block.replace(/\/\/.*/g, '').trim();
+        const blockCode = block.split('\n')
+          .map(line => line.replace(/\/\/.*/g, '').trimEnd())
+          .join('\n')
+          .trim();
         if (blockCode.length === 0) return; // Bỏ qua nếu block chỉ toàn comment
 
         // Tìm filepath trong comment block nếu có
