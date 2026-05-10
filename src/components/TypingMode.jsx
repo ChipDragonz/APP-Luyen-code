@@ -12,18 +12,25 @@ export default function TypingMode({ exercise, onComplete }) {
   const textareaRef = useRef(null);
   const codeDisplayRef = useRef(null);
 
-  const handleScroll = (e) => {
-    if (codeDisplayRef.current) {
-      const target = e.target;
-      const maxScrollTopTarget = target.scrollHeight - target.clientHeight;
-      if (maxScrollTopTarget > 0) {
-        const scrollPercentage = target.scrollTop / maxScrollTopTarget;
-        const codeDisplay = codeDisplayRef.current;
-        const maxScrollTopCode = codeDisplay.scrollHeight - codeDisplay.clientHeight;
-        codeDisplay.scrollTop = scrollPercentage * maxScrollTopCode;
+  // Auto-scroll logic and auto-focus
+  useEffect(() => {
+    const cursor = document.getElementById('cursor-span');
+    const container = codeDisplayRef.current;
+    if (cursor && container) {
+      const containerRect = container.getBoundingClientRect();
+      const cursorRect = cursor.getBoundingClientRect();
+
+      if (cursorRect.top < containerRect.top + 50 || cursorRect.bottom > containerRect.bottom - 50) {
+        container.scrollTop += cursorRect.top - containerRect.top - containerRect.height / 2;
       }
     }
-  };
+  }, [userInput]);
+
+  useEffect(() => {
+    if (textareaRef.current && !isCorrect) {
+      textareaRef.current.focus();
+    }
+  }, [exercise, isCorrect]);
 
   // Reset input when exercise changes
   useEffect(() => {
@@ -212,60 +219,92 @@ export default function TypingMode({ exercise, onComplete }) {
         <strong style={{ color: 'var(--primary-color)' }}>[GIẢI THÍCH]:</strong> {exercise.description}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', alignItems: 'stretch', marginBottom: '1rem' }}>
-        <div 
-          ref={codeDisplayRef}
-          className="code-display" 
-          style={{ margin: 0, position: 'relative', backgroundColor: '#1e1e1e', height: '400px', overflowY: 'auto' }}
-        >
-          <pre style={{ margin: 0, fontFamily: 'var(--font-mono)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-            {coloredCode.map((item, index) => {
-              const { char, syntaxColor } = item;
-              let displayColor = syntaxColor;
-              let backgroundColor = 'transparent';
-              let opacity = 1; 
+      <div 
+        ref={codeDisplayRef}
+        className="code-display" 
+        onClick={() => textareaRef.current && textareaRef.current.focus()}
+        style={{ 
+          margin: 0, 
+          position: 'relative', 
+          backgroundColor: '#1e1e1e', 
+          maxHeight: '55vh', 
+          overflowY: 'auto', 
+          cursor: 'text',
+          marginBottom: '1rem',
+          border: isCorrect ? '2px solid var(--success-color)' : '2px solid var(--border-color)',
+          transition: 'border-color 0.3s ease'
+        }}
+      >
+        {!userInput && (
+          <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', color: 'var(--primary-color)', opacity: 0.8, pointerEvents: 'none', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+            CLICK VÀO ĐÂY ĐỂ GÕ CODE
+          </div>
+        )}
+        <pre style={{ margin: 0, fontFamily: 'var(--font-mono)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+          {coloredCode.map((item, index) => {
+            const { char, syntaxColor } = item;
+            let displayColor = syntaxColor;
+            let backgroundColor = 'transparent';
+            let opacity = 1; 
 
-              if (index < userInput.length) {
-                if (userInput[index] === char) {
-                  displayColor = syntaxColor; 
-                  opacity = 0.6;
-                } else {
-                  displayColor = 'white';
-                  backgroundColor = '#f85149'; 
-                  opacity = 1;
-                }
-              } else if (index > userInput.length) {
-                displayColor = syntaxColor;
+            if (index < userInput.length) {
+              if (userInput[index] === char) {
+                displayColor = syntaxColor; 
+                opacity = 0.6;
+              } else {
+                displayColor = 'white';
+                backgroundColor = '#f85149'; 
                 opacity = 1;
               }
+            } else if (index > userInput.length) {
+              displayColor = syntaxColor;
+              opacity = 1;
+            }
 
-              if (index === userInput.length && !isCorrect) {
-                backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                opacity = 1;
-              }
+            const isCursor = index === userInput.length && !isCorrect;
+            if (isCursor) {
+              backgroundColor = 'rgba(255, 255, 255, 0.3)';
+              opacity = 1;
+            }
 
-              return (
-                <span key={index} style={{ color: displayColor, backgroundColor, opacity, transition: 'all 0.1s' }}>
-                  {char === '\n' ? '↵\n' : char}
-                </span>
-              );
-            })}
-          </pre>
-        </div>
-
-        <textarea
-          ref={textareaRef}
-          className="input-area"
-          style={{ margin: 0, height: '400px', resize: 'none', borderColor: isCorrect ? 'var(--success-color)' : 'var(--border-color)', backgroundColor: '#1e1e1e', overflowY: 'auto' }}
-          value={userInput}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onScroll={handleScroll}
-          placeholder="Bắt đầu gõ code tại đây..."
-          spellCheck="false"
-          disabled={isCorrect}
-        />
+            return (
+              <span 
+                key={index} 
+                id={isCursor ? 'cursor-span' : undefined}
+                style={{ 
+                  color: displayColor, 
+                  backgroundColor, 
+                  opacity, 
+                  transition: 'all 0.1s',
+                  borderBottom: isCursor ? '2px solid var(--primary-color)' : 'none'
+                }}>
+                {char === '\n' ? '↵\n' : char}
+              </span>
+            );
+          })}
+        </pre>
       </div>
+
+      <textarea
+        ref={textareaRef}
+        style={{ 
+          position: 'absolute', 
+          opacity: 0, 
+          zIndex: -1,
+          height: '1px', 
+          width: '1px',
+          padding: 0,
+          border: 'none'
+        }}
+        value={userInput}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        spellCheck="false"
+        autoCapitalize="off"
+        autoComplete="off"
+        autoCorrect="off"
+        disabled={isCorrect}
+      />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: isCorrect ? 'var(--success-color)' : 'var(--text-color)' }}>
